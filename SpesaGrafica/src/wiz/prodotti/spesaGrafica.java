@@ -17,7 +17,7 @@ import org.eclipse.swt.widgets.Text;
 import org.eclipse.swt.widgets.Spinner;
 
 public class spesaGrafica {
-	protected String [] carrello = new String[0];
+	protected ListaSpesa carrello = new ListaSpesa();
 	protected Shell shell;
 	protected String [] prodotti = {"patata", "cocciolata", "carota"};
 	private String [] temp;
