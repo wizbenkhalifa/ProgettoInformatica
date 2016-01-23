@@ -9,7 +9,6 @@ import org.eclipse.swt.widgets.Shell;
 
 
 import org.eclipse.swt.widgets.List;
-import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Label;
@@ -17,7 +16,6 @@ import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.swt.widgets.Spinner;
-import org.eclipse.jface.viewers.ListViewer;
 
 public class spesaGrafica {
 	protected String [] carrello = new String[0];
