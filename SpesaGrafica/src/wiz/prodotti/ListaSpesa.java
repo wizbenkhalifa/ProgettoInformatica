@@ -12,6 +12,21 @@ public class ListaSpesa {
 		lista = new Prodotto[max];
 		this.tessera = tessera;
 	}
+	
+	public ListaSpesa(boolean tessera, int max, Prodotto [] p){
+		this.max = max;
+		this.numProdotti = 0;
+		lista = new Prodotto[max];
+		this.tessera = tessera;
+		for(int i=0; i<5; i++){
+			try {
+				this.aggiungiProdotto(p[i]);
+			} catch (MyOwnException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			};
+		}
+	}
 
 	public Prodotto[] getLista() {
 		return lista;

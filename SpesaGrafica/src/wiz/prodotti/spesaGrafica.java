@@ -15,15 +15,27 @@ import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.swt.widgets.Spinner;
+import org.eclipse.swt.events.PaintListener;
+import org.eclipse.swt.events.PaintEvent;
 
 public class spesaGrafica {
-	protected String [] carrello = new String[0];
+	protected ListaSpesa carrello = new ListaSpesa(true, 10);
 	protected Shell shell;
-	protected String [] prodotti = {"patata", "cocciolata", "carota"};
-	private String [] temp;
+	private Prodotto [] p = new Prodotto[5];
+	protected ListaSpesa prodotti = new ListaSpesa(true, 10);
+	private ListaSpesa temp;
 	private Text text;
 	private Text text_1;
 	private Text text_2;
+	
+	public spesaGrafica(){
+		p[0]= new Prodotto("1111" , "Patata", 10);
+		p[1]= new Prodotto("1111" , "Alice", 10);
+		p[2]= new Prodotto("1111" , "Pizza", 10);
+		p[3]= new Prodotto("1111" , "Coccciolata", 10);
+		p[4]= new Prodotto("1111" , "Cavei", 10);
+		prodotti = new ListaSpesa(true, 10, p);
+	}
 
 	
 	public static void main(String[] args) {
@@ -48,35 +60,32 @@ public class spesaGrafica {
 		}
 	}
 	
-	public static void clone(String [] s1, String [] s2){
-		for(int i=0; i<s2.length; i++){
-			s1[i] = s2[i];
-		}
-	}
-
-	
 	protected void createContents() {
 		shell = new Shell();
 		shell.setSize(573, 296);
 		shell.setText("SWT Application");
-		
 		List list_1 = new List(shell, SWT.BORDER);
 		list_1.setBounds(455, 31, 102, 227);
-		
 		List list = new List(shell, SWT.BORDER);
-		list.setItems(prodotti);
+		for(int i=0; i<prodotti.getNumProdotti(); i++){
+			list.add(prodotti.getLista()[i].getDescrizione());
+		}
 		list.setBounds(0, 32, 102, 226);
 		
 		Button btnNewButton = new Button(shell, SWT.NONE);
 		btnNewButton.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
-				temp = new String[carrello.length+1];
-				spesaGrafica.clone(temp, carrello);
-				temp[temp.length-1] = list.getItems()[list.getSelectionIndex()];
-				carrello = new String[temp.length];
-				spesaGrafica.clone(carrello, temp);
-				System.out.print(carrello);
-				list_1.setItems(carrello);
+				temp = new ListaSpesa(true, carrello.getNumProdotti()+1);
+				System.out.println(temp.getNumProdotti());
+				temp.getLista()[temp.getNumProdotti()] = prodotti.getLista()[list.getSelectionIndex()];
+				carrello = new ListaSpesa(true, temp.getNumProdotti());
+				carrello = temp;
+				carrello.setNumProdotti(temp.getNumProdotti());
+				System.out.println(carrello.getNumProdotti());
+				for(int i=0; i<carrello.getNumProdotti(); i++){
+					list_1.add(carrello.getLista()[i].getDescrizione());
+					System.out.println(carrello.getLista()[i].getDescrizione());
+				}
 				list_1.update();
 			}
 		});
@@ -140,9 +149,7 @@ public class spesaGrafica {
 				    if(file.createNewFile()){
 				    	System.out.println("File creato");
 				    	FileWriter fw = new FileWriter(file);
-				    	for(int i=0; i<carrello.length; i++){
-				    		fw.write(i + ":" + carrello[i]);
-				    	}
+				    	fw.write("ciao");
 					    fw.flush();
 					    fw.close();
 				    }else{
