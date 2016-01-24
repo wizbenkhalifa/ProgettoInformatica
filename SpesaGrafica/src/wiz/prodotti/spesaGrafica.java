@@ -19,10 +19,10 @@ import org.eclipse.swt.events.PaintListener;
 import org.eclipse.swt.events.PaintEvent;
 
 public class spesaGrafica {
-	protected ListaSpesa carrello = new ListaSpesa(true, 10);
+	protected ListaSpesa carrello = new ListaSpesa(true, 20);
 	protected Shell shell;
 	private Prodotto [] p = new Prodotto[5];
-	protected ListaSpesa prodotti = new ListaSpesa(true, 10);
+	protected ListaSpesa prodotti = new ListaSpesa(true, 20);
 	private ListaSpesa temp;
 	private Text text;
 	private Text text_1;
@@ -75,17 +75,16 @@ public class spesaGrafica {
 		Button btnNewButton = new Button(shell, SWT.NONE);
 		btnNewButton.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
-				temp = new ListaSpesa(true, carrello.getNumProdotti()+1);
-				System.out.println(temp.getNumProdotti());
-				temp.getLista()[temp.getNumProdotti()] = prodotti.getLista()[list.getSelectionIndex()];
-				carrello = new ListaSpesa(true, temp.getNumProdotti());
-				carrello = temp;
+				temp = new ListaSpesa(true, carrello.getMax());
+				temp.setNumProdotti(carrello.getNumProdotti()+1);
+				System.out.println(temp.getMax() + " " + temp.getNumProdotti());
+				temp.getLista()[temp.getNumProdotti()-1] = prodotti.getLista()[list.getSelectionIndex()];
+				carrello = new ListaSpesa(true, temp.getMax());
 				carrello.setNumProdotti(temp.getNumProdotti());
-				System.out.println(carrello.getNumProdotti());
-				for(int i=0; i<carrello.getNumProdotti(); i++){
-					list_1.add(carrello.getLista()[i].getDescrizione());
-					System.out.println(carrello.getLista()[i].getDescrizione());
-				}
+				carrello = temp;
+				System.out.println(carrello.getMax() +" "+carrello.getNumProdotti());
+				list_1.add(carrello.getLista()[carrello.getNumProdotti()-1].getDescrizione());
+				//System.out.println(carrello.getLista()[i].getDescrizione());
 				list_1.update();
 			}
 		});
