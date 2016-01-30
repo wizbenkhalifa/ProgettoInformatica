@@ -86,7 +86,7 @@ public class spesaGrafica {
 				carrello.setNumProdotti(temp.getNumProdotti());
 				for(int i=0; i<temp.getNumProdotti(); i++){
 					carrello.getLista()[i] = temp.getLista()[i];
-				}
+				}//ciao
 				System.out.println(carrello.getMax() +" "+carrello.getNumProdotti());
 				list_1.add(carrello.getLista()[carrello.getNumProdotti()-1].getDescrizione());
 				//System.out.println(carrello.getLista()[i].getDescrizione());
