@@ -77,11 +77,16 @@ public class spesaGrafica {
 			public void widgetSelected(SelectionEvent e) {
 				temp = new ListaSpesa(true, carrello.getMax());
 				temp.setNumProdotti(carrello.getNumProdotti()+1);
+				for(int i=0; i<carrello.getNumProdotti(); i++){
+					temp.getLista()[i] = carrello.getLista()[i];
+				}
 				System.out.println(temp.getMax() + " " + temp.getNumProdotti());
 				temp.getLista()[temp.getNumProdotti()-1] = prodotti.getLista()[list.getSelectionIndex()];
 				carrello = new ListaSpesa(true, temp.getMax());
 				carrello.setNumProdotti(temp.getNumProdotti());
-				carrello = temp;
+				for(int i=0; i<temp.getNumProdotti(); i++){
+					carrello.getLista()[i] = temp.getLista()[i];
+				}
 				System.out.println(carrello.getMax() +" "+carrello.getNumProdotti());
 				list_1.add(carrello.getLista()[carrello.getNumProdotti()-1].getDescrizione());
 				//System.out.println(carrello.getLista()[i].getDescrizione());
@@ -162,6 +167,34 @@ public class spesaGrafica {
 		});
 		btnSalvaScontrino.setText("Salva Scontrino");
 		btnSalvaScontrino.setBounds(274, 96, 115, 25);
+		
+		Button btnCaricaProdotto = new Button(shell, SWT.NONE);
+		btnCaricaProdotto.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				Prodotto pa = new Prodotto(text.getText(), text_2.getText(), Float.parseFloat(text_1.getText()));
+				try {
+					prodotti.aggiungiProdotto(pa);
+				} catch (MyOwnException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
+				list.add(pa.descrizione);
+			}
+		});
+		btnCaricaProdotto.setBounds(145, 133, 102, 25);
+		btnCaricaProdotto.setText("Carica Prodotto");
+		
+		Button btnEliminaProdotto = new Button(shell, SWT.NONE);
+		btnEliminaProdotto.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				list.remove(list.getSelectionIndex());
+				prodotti.eliminaProdotto(list.getSelectionIndex());
+			}
+		});
+		btnEliminaProdotto.setBounds(274, 133, 108, 25);
+		btnEliminaProdotto.setText("Elimina prodotto");
 
 	}
 }
