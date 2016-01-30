@@ -1,5 +1,6 @@
 package wiz.prodotti;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -27,6 +28,7 @@ public class spesaGrafica {
 	private Text text;
 	private Text text_1;
 	private Text text_2;
+	private File file = new File("scontrino.txt");
 	
 	public spesaGrafica(){
 		p[0]= new Prodotto("1111" , "Patata", 10);
@@ -172,6 +174,23 @@ public class spesaGrafica {
 		spinner.setBounds(354, 200, 47, 22);
 		
 		Button btnCaricaScontrino = new Button(shell, SWT.NONE);
+		btnCaricaScontrino.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				String s1 = new String();
+				char [] s = new char[(int)file.length()];
+				try {
+					FileReader fr = new FileReader("scontrino.txt");
+					fr.read(s);
+					//System.out.print(s);
+					} catch (IOException e1) {
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
+					}
+					String.valueOf(s);
+					System.out.print(s1);
+			}
+		});
 		btnCaricaScontrino.setBounds(132, 96, 115, 25);
 		btnCaricaScontrino.setText("Carica Scontrino");
 		
@@ -180,13 +199,11 @@ public class spesaGrafica {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 				try {
-				    File file = new File("scontrino.txt");
 				    if(file.createNewFile()){
 				    	FileWriter fw = new FileWriter(file);
 				    	int i = 0;
 				    	while(i<carrello.getNumProdotti()){
-					    	fw.write(+i + " "+carrello.getLista()[i].getDescrizione() + " " + carrello.getLista()[i].getPrezzo() + " " + carrello.getLista()[i].getCodice());
-					    	fw.flush();
+					    	fw.write(i + " "+carrello.getLista()[i].getDescrizione() + " " + carrello.getLista()[i].getPrezzo() + " " + carrello.getLista()[i].getCodice() + "\r\n");
 					    	i++;
 				    	}
 				    	fw.close();
