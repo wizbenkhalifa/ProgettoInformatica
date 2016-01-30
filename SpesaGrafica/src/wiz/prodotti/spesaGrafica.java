@@ -77,14 +77,17 @@ public class spesaGrafica {
 			public void widgetSelected(SelectionEvent e) {
 				temp = new ListaSpesa(true, carrello.getMax());
 				temp.setNumProdotti(carrello.getNumProdotti()+1);
+				for(int i=0; i<carrello.getNumProdotti(); i++){
+					temp.getLista()[i] = carrello.getLista()[i];
+				}
 				System.out.println(temp.getMax() + " " + temp.getNumProdotti());
 				temp.getLista()[temp.getNumProdotti()-1] = prodotti.getLista()[list.getSelectionIndex()];
 				carrello = new ListaSpesa(true, temp.getMax());
 				carrello.setNumProdotti(temp.getNumProdotti());
-				carrello = temp;
-				System.out.println(carrello.getMax() +" "+carrello.getNumProdotti());
+				for(int i=0; i<temp.getNumProdotti(); i++){
+					carrello.getLista()[i] = temp.getLista()[i];
+				}
 				list_1.add(carrello.getLista()[carrello.getNumProdotti()-1].getDescrizione());
-				//System.out.println(carrello.getLista()[i].getDescrizione());
 				list_1.update();
 			}
 		});
@@ -146,11 +149,14 @@ public class spesaGrafica {
 				try {
 				    File file = new File("scontrino.txt");
 				    if(file.createNewFile()){
-				    	System.out.println("File creato");
 				    	FileWriter fw = new FileWriter(file);
-				    	fw.write("ciao");
-					    fw.flush();
-					    fw.close();
+				    	int i = 0;
+				    	while(i<carrello.getNumProdotti()){
+					    	fw.write(+i + " "+carrello.getLista()[i].getDescrizione() + " " + carrello.getLista()[i].getPrezzo() + " " + carrello.getLista()[i].getCodice());
+					    	fw.flush();
+					    	i++;
+				    	}
+				    	fw.close();
 				    }else{
 				    	System.out.println("Non è stato possibile creare il file");
 				    }
