@@ -32,7 +32,7 @@ public class spesaGrafica {
 		p[0]= new Prodotto("1111" , "Patata", 10);
 		p[1]= new Prodotto("1111" , "Alice", 10);
 		p[2]= new Prodotto("1111" , "Pizza", 10);
-		p[3]= new Prodotto("1111" , "Coccciolata", 10);
+		p[3]= new Prodotto("1111" , "Ciocccolata", 10);
 		p[4]= new Prodotto("1111" , "Cavei", 10);
 		prodotti = new ListaSpesa(true, 10, p);
 	}
@@ -119,15 +119,29 @@ public class spesaGrafica {
 		btnEliminaProdotto.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				System.out.print(list.getSelectionIndex() + "\n");
-				prodotti.eliminaProdotto(2);
-				list.remove(list.getSelectionIndex());
+				System.out.print(list_1.getSelectionIndex() + "\n");
+				carrello.eliminaProdotto(list_1.getSelectionIndex());
+				list_1.remove(list_1.getSelectionIndex());
 			}
 		});
 		btnEliminaProdotto.setBounds(274, 133, 108, 25);
 		btnEliminaProdotto.setText("Elimina prodotto");
 		
 		Button btnNewButton_1 = new Button(shell, SWT.NONE);
+		btnNewButton_1.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				list.add(carrello.getLista()[list_1.getSelectionIndex()].getDescrizione());
+				try {
+					prodotti.aggiungiProdotto(carrello.getLista()[list_1.getSelectionIndex()]);
+				} catch (MyOwnException e1) {
+					e1.printStackTrace();
+				}
+				carrello.eliminaProdotto(list_1.getSelectionIndex());
+				list_1.remove(list_1.getSelectionIndex());
+				System.out.println(prodotti.getNumProdotti() + carrello.getNumProdotti());
+			}
+		});
 		btnNewButton_1.setBounds(172, 50, 75, 25);
 		btnNewButton_1.setText("Riponi");
 		
