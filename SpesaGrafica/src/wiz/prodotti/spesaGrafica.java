@@ -7,6 +7,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.util.Date;
 
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
@@ -34,13 +35,14 @@ public class spesaGrafica {
 	private Text text_2;
 	private File file = new File("scontrino.txt");
 	private FileReader fr;
+	private Data Data;
 	
 	public spesaGrafica(){
-		p[0]= new Prodotto("1111" , "Patata", 10);
-		p[1]= new Prodotto("1111" , "Alice", 10);
-		p[2]= new Prodotto("1111" , "Pizza", 10);
-		p[3]= new Prodotto("1111" , "Ciocccolata", 10);
-		p[4]= new Prodotto("1111" , "Cavei", 10);
+		p[0]= new NonAlimentare("1111" , "Patata", 10, "Vetro");
+		p[1]= new NonAlimentare("1111" , "Alice", 10, "Carta");
+		p[2]= new Alimentare("1111" , "Pizza", 10, Data = new Data());
+		p[3]= new Alimentare("1111" , "Ciocccolata", 10, Data = new Data());
+		p[4]= new NonAlimentare("1111" , "Cavei", 10, "Plastica");
 		prodotti = new ListaSpesa(true, 10, p);
 	}
 
@@ -208,8 +210,14 @@ public class spesaGrafica {
 					while ((s = br.readLine()) != null) {
 						stringBuffer.append(s);
 						s1 = s.split(" ");
-						Prodotto p1 = new Prodotto(s1[2], s1[1], Float.parseFloat(s1[3]));
-						carrello.aggiungiProdotto(p1);
+						Prodotto p1;
+						if(s1[3].equals("Carta") || s1[3].equals("Vetro") || s1[3].equals("Plastica")){
+							p1 = new NonAlimentare(s1[2], s1[1], Float.parseFloat(s1[3]), s1[3]);
+						}else{
+							System.out.println(Data);
+							p1 = new Alimentare(s1[2], s1[1], Float.parseFloat(s1[3]), Data = new Data(Integer.parseInt((s1[4].split("/"))[0]), Integer.parseInt((s1[4].split("/"))[1]), Integer.parseInt((s1[4].split("/"))[2])));
+						}
+						carrello.aggiungiProdotto(p1);	
 						list_1.add(s1[1]);
 					}
 				} catch (IOException e1) {
