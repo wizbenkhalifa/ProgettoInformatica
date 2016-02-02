@@ -1,9 +1,13 @@
 package wiz.prodotti;
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 
@@ -29,6 +33,7 @@ public class spesaGrafica {
 	private Text text_1;
 	private Text text_2;
 	private File file = new File("scontrino.txt");
+	private FileReader fr;
 	
 	public spesaGrafica(){
 		p[0]= new Prodotto("1111" , "Patata", 10);
@@ -136,12 +141,13 @@ public class spesaGrafica {
 				list.add(carrello.getLista()[list_1.getSelectionIndex()].getDescrizione());
 				try {
 					prodotti.aggiungiProdotto(carrello.getLista()[list_1.getSelectionIndex()]);
+					carrello.eliminaProdotto(list_1.getSelectionIndex());
 				} catch (MyOwnException e1) {
 					e1.printStackTrace();
 				}
-				carrello.eliminaProdotto(list_1.getSelectionIndex());
 				list_1.remove(list_1.getSelectionIndex());
-				System.out.println(prodotti.getNumProdotti() + carrello.getNumProdotti());
+				System.out.println(carrello.getNumProdotti());
+				System.out.println(prodotti.getNumProdotti());
 			}
 		});
 		btnNewButton_1.setBounds(172, 50, 75, 25);
@@ -191,18 +197,28 @@ public class spesaGrafica {
 		btnCaricaScontrino.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				String s1 = new String();
-				char [] s = new char[(int)file.length()];
 				try {
-					FileReader fr = new FileReader("scontrino.txt");
-					fr.read(s);
-					//System.out.print(s);
-					} catch (IOException e1) {
-						// TODO Auto-generated catch block
-						e1.printStackTrace();
+					String [] s1 = new String[4];
+					String s = new String();
+					fr = new FileReader(file);
+					BufferedReader br = new BufferedReader(fr);
+					StringBuffer stringBuffer = new StringBuffer();
+					list_1.removeAll();
+					carrello = new ListaSpesa(true, carrello.getMax());
+					while ((s = br.readLine()) != null) {
+						stringBuffer.append(s);
+						s1 = s.split(" ");
+						Prodotto p1 = new Prodotto(s1[2], s1[1], Float.parseFloat(s1[3]));
+						carrello.aggiungiProdotto(p1);
+						list_1.add(s1[1]);
 					}
-					String.valueOf(s);
-					System.out.print(s1);
+				} catch (IOException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				} catch (MyOwnException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
 			}
 		});
 		btnCaricaScontrino.setBounds(132, 96, 115, 25);
@@ -217,7 +233,7 @@ public class spesaGrafica {
 				    	FileWriter fw = new FileWriter(file);
 				    	int i = 0;
 				    	while(i<carrello.getNumProdotti()){
-					    	fw.write(i + " "+carrello.getLista()[i].getDescrizione() + " " + carrello.getLista()[i].getPrezzo() + " " + carrello.getLista()[i].getCodice() + "\r\n");
+					    	fw.write(i+1 + " "+carrello.getLista()[i].getDescrizione() + " " + carrello.getLista()[i].getPrezzo() + " " + carrello.getLista()[i].getCodice() + "\r\n");
 					    	i++;
 				    	}
 				    	fw.close();
