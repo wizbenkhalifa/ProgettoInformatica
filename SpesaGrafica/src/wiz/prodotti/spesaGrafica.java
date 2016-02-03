@@ -23,6 +23,7 @@ import org.eclipse.swt.widgets.Text;
 import org.eclipse.swt.widgets.Spinner;
 import org.eclipse.swt.events.PaintListener;
 import org.eclipse.swt.events.PaintEvent;
+import org.eclipse.swt.widgets.DateTime;
 
 public class spesaGrafica {
 	protected ListaSpesa carrello = new ListaSpesa(true, 20);
@@ -36,6 +37,7 @@ public class spesaGrafica {
 	private File file = new File("scontrino.txt");
 	private FileReader fr;
 	private Data Data;
+	private Text text_3;
 	
 	public spesaGrafica(){
 		p[0]= new NonAlimentare("1111" , "Patata", 10, "Vetro");
@@ -71,7 +73,7 @@ public class spesaGrafica {
 	
 	protected void createContents() {
 		shell = new Shell();
-		shell.setSize(573, 296);
+		shell.setSize(573, 418);
 		shell.setText("SWT Application");
 		List list_1 = new List(shell, SWT.BORDER);
 		list_1.setBounds(455, 31, 102, 227);
@@ -107,18 +109,46 @@ public class spesaGrafica {
 		btnNewButton.setBounds(274, 50, 75, 25);
 		btnNewButton.setText("Prendi");
 		
+		DateTime dateTime = new DateTime(shell, SWT.BORDER);
+		dateTime.setBounds(283, 255, 80, 24);
+		
+		Button btnAlimentare = new Button(shell, SWT.RADIO);
+		btnAlimentare.setBounds(172, 310, 90, 16);
+		btnAlimentare.setText("Alimentare");
+		
+		Button btnNonAlimentare = new Button(shell, SWT.RADIO);
+		btnNonAlimentare.setBounds(292, 310, 109, 16);
+		btnNonAlimentare.setText("Non Alimentare");
+		
+
+		Label lblMateriale = new Label(shell, SWT.NONE);
+		lblMateriale.setBounds(182, 276, 55, 15);
+		lblMateriale.setText("Materiale");
+		
+		text_3 = new Text(shell, SWT.BORDER);
+		text_3.setBounds(273, 283, 76, 21);
 		
 		Button btnCaricaProdotto = new Button(shell, SWT.NONE);
 		btnCaricaProdotto.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				Prodotto pa = new Prodotto(text.getText(), text_2.getText(), Float.parseFloat(text_1.getText()));
-				try {
-					prodotti.aggiungiProdotto(pa);
-				} catch (MyOwnException e1) {
-					e1.printStackTrace();
+				if(btnAlimentare.getSelection()){
+					Prodotto pa = new Alimentare(text.getText(), text_2.getText(), Float.parseFloat(text_1.getText()), Data = new Data(dateTime.getDay(), dateTime.getMonth(), dateTime.getYear()));
+					try {
+						prodotti.aggiungiProdotto(pa);
+					} catch (MyOwnException e1) {
+						e1.printStackTrace();
+					}
+					list.add(pa.descrizione);
+				}else if(btnNonAlimentare.getSelection()){
+					Prodotto pa = new NonAlimentare(text.getText(), text_2.getText(), Float.parseFloat(text_1.getText()), text_3.getText());
+					try {
+						prodotti.aggiungiProdotto(pa);
+					} catch (MyOwnException e1) {
+						e1.printStackTrace();
+					}
+					list.add(pa.descrizione);
 				}
-				list.add(pa.descrizione);
 			}
 		});
 		btnCaricaProdotto.setBounds(145, 133, 102, 25);
@@ -256,6 +286,11 @@ public class spesaGrafica {
 		});
 		btnSalvaScontrino.setText("Salva Scontrino");
 		btnSalvaScontrino.setBounds(274, 96, 115, 25);
+		
+		Label lblDataScadenxa = new Label(shell, SWT.NONE);
+		lblDataScadenxa.setBounds(172, 255, 102, 15);
+		lblDataScadenxa.setText("Data Scadenza");
+		
 
 	}
 }
