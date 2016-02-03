@@ -74,12 +74,12 @@ public class spesaGrafica {
 		shell.setSize(573, 296);
 		shell.setText("SWT Application");
 		List list_1 = new List(shell, SWT.BORDER);
-		list_1.setBounds(455, 31, 102, 227);
+		list_1.setBounds(419, 31, 138, 227);
 		List list = new List(shell, SWT.BORDER);
 		for(int i=0; i<prodotti.getNumProdotti(); i++){
 			list.add(prodotti.getLista()[i].getDescrizione());
 		}
-		list.setBounds(0, 32, 102, 226);
+		list.setBounds(0, 32, 126, 226);
 		
 		Button btnNewButton = new Button(shell, SWT.NONE);
 		btnNewButton.addSelectionListener(new SelectionAdapter() {
@@ -211,14 +211,14 @@ public class spesaGrafica {
 						stringBuffer.append(s);
 						s1 = s.split(" ");
 						Prodotto p1;
-						if(s1[3].equals("Carta") || s1[3].equals("Vetro") || s1[3].equals("Plastica")){
-							p1 = new NonAlimentare(s1[2], s1[1], Float.parseFloat(s1[3]), s1[3]);
+						if(s1[4].equals("Carta") || s1[4].equals("Vetro") || s1[4].equals("Plastica")){
+							p1 = new NonAlimentare(s1[2], s1[1], Float.parseFloat(s1[3]), s1[4]);
 						}else{
 							System.out.println(Data);
 							p1 = new Alimentare(s1[2], s1[1], Float.parseFloat(s1[3]), Data = new Data(Integer.parseInt((s1[4].split("/"))[0]), Integer.parseInt((s1[4].split("/"))[1]), Integer.parseInt((s1[4].split("/"))[2])));
 						}
 						carrello.aggiungiProdotto(p1);	
-						list_1.add(s1[1]);
+						list_1.add(s1[1] + " " + s1[4]);
 					}
 				} catch (IOException e1) {
 					// TODO Auto-generated catch block
@@ -240,8 +240,17 @@ public class spesaGrafica {
 				    if(file.createNewFile()){
 				    	FileWriter fw = new FileWriter(file);
 				    	int i = 0;
-				    	while(i<carrello.getNumProdotti()){
-					    	fw.write(i+1 + " "+carrello.getLista()[i].getDescrizione() + " " + carrello.getLista()[i].getPrezzo() + " " + carrello.getLista()[i].getCodice() + "\r\n");
+				    	Alimentare a;
+				    	NonAlimentare na;
+				    	while(i<carrello.getNumProdotti()){				    		
+				    		if (carrello.getLista()[i] instanceof Alimentare) {
+				    			a = (Alimentare)carrello.getLista()[i];
+				    			fw.write(i+1 + " "+a.getDescrizione() + " " + a.getPrezzo() + " " + a.getCodice() + " " + a.getScadenza() + "\r\n");
+				    		} else {
+				    			na = (NonAlimentare)carrello.getLista()[i];
+				    			fw.write(i+1 + " "+na.getDescrizione() + " " + na.getPrezzo() + " " + na.getCodice() + " "+ na.getMateriale() + "\r\n");
+				    		}
+					    	
 					    	i++;
 				    	}
 				    	fw.close();
