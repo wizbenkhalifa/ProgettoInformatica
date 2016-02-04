@@ -54,7 +54,7 @@ public class ListaSpesa {
 	}
 	
 	public void aggiungiProdotto(Prodotto p) throws MyOwnException{
-		if(numProdotti<max){
+		if(numProdotti<=max){
 			if(tessera){
 				p.applicaSconto();
 				lista[numProdotti++] = p;
