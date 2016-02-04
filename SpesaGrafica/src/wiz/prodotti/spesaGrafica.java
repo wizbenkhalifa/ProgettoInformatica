@@ -1,5 +1,6 @@
 package wiz.prodotti;
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
@@ -10,10 +11,12 @@ import java.io.InputStreamReader;
 import java.util.Date;
 
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Shell;
 
 
 import org.eclipse.swt.widgets.List;
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Label;
@@ -34,10 +37,12 @@ public class spesaGrafica {
 	private Text text;
 	private Text text_1;
 	private Text text_2;
+	private String fs = new String();
 	private File file = new File("scontrino.txt");
 	private FileReader fr;
 	private Data Data;
 	private Text text_3;
+	private Boolean on;
 	
 	public spesaGrafica(){
 		p[0]= new NonAlimentare("1111" , "Patata", 10, "Vetro");
@@ -45,7 +50,8 @@ public class spesaGrafica {
 		p[2]= new Alimentare("1111" , "Pizza", 10, Data = new Data());
 		p[3]= new Alimentare("1111" , "Ciocccolata", 10, Data = new Data());
 		p[4]= new NonAlimentare("1111" , "Cavei", 10, "Plastica");
-		prodotti = new ListaSpesa(true, 10, p);
+		prodotti = new ListaSpesa(false, 10, p);
+		on = false;
 	}
 
 	
@@ -73,6 +79,18 @@ public class spesaGrafica {
 	
 	protected void createContents() {
 		shell = new Shell();
+		shell.addPaintListener(new PaintListener() {
+			public void paintControl(PaintEvent arg0) {
+				if(!on){
+					on = true;
+					if(MessageDialog.openQuestion(shell, "Tessera", "Possiedi la tessera fedeltà?")){
+						carrello.setTessera(true);
+					}else{
+						carrello.setTessera(false);
+					}
+				}
+			}
+		});
 		shell.setSize(573, 418);
 		shell.setText("SWT Application");
 		List list_1 = new List(shell, SWT.BORDER);
@@ -185,6 +203,23 @@ public class spesaGrafica {
 		btnNewButton_1.setBounds(172, 50, 75, 25);
 		btnNewButton_1.setText("Riponi");
 		
+		Button btnCaio = new Button(shell, SWT.NONE);
+		btnCaio.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				FileDialog fd = new FileDialog(shell);
+				fd.setFilterExtensions(new String[]{"*.txt", "*.csv", "*.*"});
+				fs = fd.open();
+				
+				if(fs != null) {
+					file = new File(fs);
+				}
+
+			}
+		});
+		btnCaio.setBounds(0, 264, 75, 25);
+		btnCaio.setText("Browse File");
+		
 		Label lblScaffali = new Label(shell, SWT.NONE);
 		lblScaffali.setBounds(10, 10, 71, 15);
 		lblScaffali.setText("Scaffali");
@@ -268,7 +303,8 @@ public class spesaGrafica {
 			public void widgetSelected(SelectionEvent e) {
 				try {
 				    if(file.createNewFile()){
-				    	FileWriter fw = new FileWriter(file);
+				    	FileWriter f = new FileWriter(file, false);
+				    	BufferedWriter fw = new BufferedWriter(f);
 				    	int i = 0;
 				    	Alimentare a;
 				    	NonAlimentare na;
@@ -285,7 +321,26 @@ public class spesaGrafica {
 				    	}
 				    	fw.close();
 				    }else{
-				    	System.out.println("Non è stato possibile creare il file");
+				    	 File fold=new File(fs);
+				         fold.delete();
+				         FileWriter f = new FileWriter(file, false);
+					    	BufferedWriter fw = new BufferedWriter(f);
+					    	int i = 0;
+					    	Alimentare a;
+					    	NonAlimentare na;
+					    	while(i<carrello.getNumProdotti()){				    		
+					    		if (carrello.getLista()[i] instanceof Alimentare) {
+					    			a = (Alimentare)carrello.getLista()[i];
+					    			fw.write(i+1 + " "+a.getDescrizione() + " " + a.getPrezzo() + " " + a.getCodice() + " " + a.getScadenza() + "\r\n");
+					    		} else {
+					    			na = (NonAlimentare)carrello.getLista()[i];
+					    			fw.write(i+1 + " "+na.getDescrizione() + " " + na.getPrezzo() + " " + na.getCodice() + " "+ na.getMateriale() + "\r\n");
+					    		}
+						    	
+						    	i++;
+					    	}
+					    	fw.close();
+					    	MessageDialog.openInformation(shell, "Avviso", "Salvataggio riuscito");
 				    }
 				  }
 				  catch (IOException e1) {
