@@ -1,5 +1,6 @@
 package wiz.prodotti;
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
@@ -10,10 +11,12 @@ import java.io.InputStreamReader;
 import java.util.Date;
 
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Shell;
 
 
 import org.eclipse.swt.widgets.List;
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Label;
@@ -23,6 +26,7 @@ import org.eclipse.swt.widgets.Text;
 import org.eclipse.swt.widgets.Spinner;
 import org.eclipse.swt.events.PaintListener;
 import org.eclipse.swt.events.PaintEvent;
+import org.eclipse.swt.widgets.DateTime;
 
 public class spesaGrafica {
 	protected ListaSpesa carrello = new ListaSpesa(true, 20);
@@ -33,9 +37,12 @@ public class spesaGrafica {
 	private Text text;
 	private Text text_1;
 	private Text text_2;
+	private String fs = new String();
 	private File file = new File("scontrino.txt");
 	private FileReader fr;
 	private Data Data;
+	private Text text_3;
+	private Boolean on;
 	
 	public spesaGrafica(){
 		p[0]= new NonAlimentare("1111" , "Patata", 10, "Vetro");
@@ -43,7 +50,8 @@ public class spesaGrafica {
 		p[2]= new Alimentare("1111" , "Pizza", 10, Data = new Data());
 		p[3]= new Alimentare("1111" , "Ciocccolata", 10, Data = new Data());
 		p[4]= new NonAlimentare("1111" , "Cavei", 10, "Plastica");
-		prodotti = new ListaSpesa(true, 10, p);
+		prodotti = new ListaSpesa(false, 10, p);
+		on = false;
 	}
 
 	
@@ -71,15 +79,27 @@ public class spesaGrafica {
 	
 	protected void createContents() {
 		shell = new Shell();
-		shell.setSize(573, 296);
+		shell.addPaintListener(new PaintListener() {
+			public void paintControl(PaintEvent arg0) {
+				if(!on){
+					on = true;
+					if(MessageDialog.openQuestion(shell, "Tessera", "Possiedi la tessera fedeltà?")){
+						carrello.setTessera(true);
+					}else{
+						carrello.setTessera(false);
+					}
+				}
+			}
+		});
+		shell.setSize(573, 418);
 		shell.setText("SWT Application");
 		List list_1 = new List(shell, SWT.BORDER);
-		list_1.setBounds(455, 31, 102, 227);
+		list_1.setBounds(419, 31, 138, 227);
 		List list = new List(shell, SWT.BORDER);
 		for(int i=0; i<prodotti.getNumProdotti(); i++){
 			list.add(prodotti.getLista()[i].getDescrizione());
 		}
-		list.setBounds(0, 32, 102, 226);
+		list.setBounds(0, 32, 126, 226);
 		
 		Button btnNewButton = new Button(shell, SWT.NONE);
 		btnNewButton.addSelectionListener(new SelectionAdapter() {
@@ -107,18 +127,46 @@ public class spesaGrafica {
 		btnNewButton.setBounds(274, 50, 75, 25);
 		btnNewButton.setText("Prendi");
 		
+		DateTime dateTime = new DateTime(shell, SWT.BORDER);
+		dateTime.setBounds(283, 255, 80, 24);
+		
+		Button btnAlimentare = new Button(shell, SWT.RADIO);
+		btnAlimentare.setBounds(172, 310, 90, 16);
+		btnAlimentare.setText("Alimentare");
+		
+		Button btnNonAlimentare = new Button(shell, SWT.RADIO);
+		btnNonAlimentare.setBounds(292, 310, 109, 16);
+		btnNonAlimentare.setText("Non Alimentare");
+		
+
+		Label lblMateriale = new Label(shell, SWT.NONE);
+		lblMateriale.setBounds(182, 276, 55, 15);
+		lblMateriale.setText("Materiale");
+		
+		text_3 = new Text(shell, SWT.BORDER);
+		text_3.setBounds(273, 283, 76, 21);
 		
 		Button btnCaricaProdotto = new Button(shell, SWT.NONE);
 		btnCaricaProdotto.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				Prodotto pa = new Prodotto(text.getText(), text_2.getText(), Float.parseFloat(text_1.getText()));
-				try {
-					prodotti.aggiungiProdotto(pa);
-				} catch (MyOwnException e1) {
-					e1.printStackTrace();
+				if(btnAlimentare.getSelection()){
+					Prodotto pa = new Alimentare(text.getText(), text_2.getText(), Float.parseFloat(text_1.getText()), Data = new Data(dateTime.getDay(), dateTime.getMonth(), dateTime.getYear()));
+					try {
+						prodotti.aggiungiProdotto(pa);
+					} catch (MyOwnException e1) {
+						e1.printStackTrace();
+					}
+					list.add(pa.descrizione);
+				}else if(btnNonAlimentare.getSelection()){
+					Prodotto pa = new NonAlimentare(text.getText(), text_2.getText(), Float.parseFloat(text_1.getText()), text_3.getText());
+					try {
+						prodotti.aggiungiProdotto(pa);
+					} catch (MyOwnException e1) {
+						e1.printStackTrace();
+					}
+					list.add(pa.descrizione);
 				}
-				list.add(pa.descrizione);
 			}
 		});
 		btnCaricaProdotto.setBounds(145, 133, 102, 25);
@@ -154,6 +202,23 @@ public class spesaGrafica {
 		});
 		btnNewButton_1.setBounds(172, 50, 75, 25);
 		btnNewButton_1.setText("Riponi");
+		
+		Button btnCaio = new Button(shell, SWT.NONE);
+		btnCaio.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				FileDialog fd = new FileDialog(shell);
+				fd.setFilterExtensions(new String[]{"*.txt", "*.csv", "*.*"});
+				fs = fd.open();
+				
+				if(fs != null) {
+					file = new File(fs);
+				}
+
+			}
+		});
+		btnCaio.setBounds(0, 264, 75, 25);
+		btnCaio.setText("Browse File");
 		
 		Label lblScaffali = new Label(shell, SWT.NONE);
 		lblScaffali.setBounds(10, 10, 71, 15);
@@ -211,14 +276,14 @@ public class spesaGrafica {
 						stringBuffer.append(s);
 						s1 = s.split(" ");
 						Prodotto p1;
-						if(s1[3].equals("Carta") || s1[3].equals("Vetro") || s1[3].equals("Plastica")){
-							p1 = new NonAlimentare(s1[2], s1[1], Float.parseFloat(s1[3]), s1[3]);
+						if(s1[4].equals("Carta") || s1[4].equals("Vetro") || s1[4].equals("Plastica")){
+							p1 = new NonAlimentare(s1[2], s1[1], Float.parseFloat(s1[3]), s1[4]);
 						}else{
 							System.out.println(Data);
 							p1 = new Alimentare(s1[2], s1[1], Float.parseFloat(s1[3]), Data = new Data(Integer.parseInt((s1[4].split("/"))[0]), Integer.parseInt((s1[4].split("/"))[1]), Integer.parseInt((s1[4].split("/"))[2])));
 						}
 						carrello.aggiungiProdotto(p1);	
-						list_1.add(s1[1]);
+						list_1.add(s1[1] + " " + s1[4]);
 					}
 				} catch (IOException e1) {
 					// TODO Auto-generated catch block
@@ -238,15 +303,44 @@ public class spesaGrafica {
 			public void widgetSelected(SelectionEvent e) {
 				try {
 				    if(file.createNewFile()){
-				    	FileWriter fw = new FileWriter(file);
+				    	FileWriter f = new FileWriter(file, false);
+				    	BufferedWriter fw = new BufferedWriter(f);
 				    	int i = 0;
-				    	while(i<carrello.getNumProdotti()){
-					    	fw.write(i+1 + " "+carrello.getLista()[i].getDescrizione() + " " + carrello.getLista()[i].getPrezzo() + " " + carrello.getLista()[i].getCodice() + "\r\n");
+				    	Alimentare a;
+				    	NonAlimentare na;
+				    	while(i<carrello.getNumProdotti()){				    		
+				    		if (carrello.getLista()[i] instanceof Alimentare) {
+				    			a = (Alimentare)carrello.getLista()[i];
+				    			fw.write(i+1 + " "+a.getDescrizione() + " " + a.getPrezzo() + " " + a.getCodice() + " " + a.getScadenza() + "\r\n");
+				    		} else {
+				    			na = (NonAlimentare)carrello.getLista()[i];
+				    			fw.write(i+1 + " "+na.getDescrizione() + " " + na.getPrezzo() + " " + na.getCodice() + " "+ na.getMateriale() + "\r\n");
+				    		}
+					    	
 					    	i++;
 				    	}
 				    	fw.close();
 				    }else{
-				    	System.out.println("Non è stato possibile creare il file");
+				    	 File fold=new File(fs);
+				         fold.delete();
+				         FileWriter f = new FileWriter(file, false);
+					    	BufferedWriter fw = new BufferedWriter(f);
+					    	int i = 0;
+					    	Alimentare a;
+					    	NonAlimentare na;
+					    	while(i<carrello.getNumProdotti()){				    		
+					    		if (carrello.getLista()[i] instanceof Alimentare) {
+					    			a = (Alimentare)carrello.getLista()[i];
+					    			fw.write(i+1 + " "+a.getDescrizione() + " " + a.getPrezzo() + " " + a.getCodice() + " " + a.getScadenza() + "\r\n");
+					    		} else {
+					    			na = (NonAlimentare)carrello.getLista()[i];
+					    			fw.write(i+1 + " "+na.getDescrizione() + " " + na.getPrezzo() + " " + na.getCodice() + " "+ na.getMateriale() + "\r\n");
+					    		}
+						    	
+						    	i++;
+					    	}
+					    	fw.close();
+					    	MessageDialog.openInformation(shell, "Avviso", "Salvataggio riuscito");
 				    }
 				  }
 				  catch (IOException e1) {
@@ -256,6 +350,11 @@ public class spesaGrafica {
 		});
 		btnSalvaScontrino.setText("Salva Scontrino");
 		btnSalvaScontrino.setBounds(274, 96, 115, 25);
+		
+		Label lblDataScadenxa = new Label(shell, SWT.NONE);
+		lblDataScadenxa.setBounds(172, 255, 102, 15);
+		lblDataScadenxa.setText("Data Scadenza");
+		
 
 	}
 }
