@@ -27,12 +27,13 @@ import org.eclipse.swt.widgets.Spinner;
 import org.eclipse.swt.events.PaintListener;
 import org.eclipse.swt.events.PaintEvent;
 import org.eclipse.swt.widgets.DateTime;
+import org.eclipse.wb.swt.SWTResourceManager;
 
 public class spesaGrafica {
-	protected ListaSpesa carrello = new ListaSpesa(true, 20);
+	protected ListaSpesa carrello = new ListaSpesa(true, 40);
 	protected Shell shell;
 	private Prodotto [] p = new Prodotto[5];
-	protected ListaSpesa prodotti = new ListaSpesa(true, 20);
+	protected ListaSpesa prodotti = new ListaSpesa(true, 40);
 	private ListaSpesa temp;
 	private Text text;
 	private Text text_1;
@@ -79,6 +80,7 @@ public class spesaGrafica {
 	
 	protected void createContents() {
 		shell = new Shell();
+		shell.setBackgroundImage(SWTResourceManager.getImage("C:\\Users\\psman\\git\\ProgettoInformatica\\SpesaGrafica\\SPESA.jpg"));
 		shell.addPaintListener(new PaintListener() {
 			public void paintControl(PaintEvent arg0) {
 				if(!on){
@@ -91,15 +93,15 @@ public class spesaGrafica {
 				}
 			}
 		});
-		shell.setSize(573, 418);
+		shell.setSize(717, 423);
 		shell.setText("SWT Application");
 		List list_1 = new List(shell, SWT.BORDER);
-		list_1.setBounds(419, 31, 138, 227);
+		list_1.setBounds(553, 32, 138, 294);
 		List list = new List(shell, SWT.BORDER);
 		for(int i=0; i<prodotti.getNumProdotti(); i++){
 			list.add(prodotti.getLista()[i].getDescrizione());
 		}
-		list.setBounds(0, 32, 126, 226);
+		list.setBounds(10, 32, 126, 294);
 		
 		Button btnNewButton = new Button(shell, SWT.NONE);
 		btnNewButton.addSelectionListener(new SelectionAdapter() {
@@ -124,27 +126,32 @@ public class spesaGrafica {
 				list_1.update();
 			}
 		});
-		btnNewButton.setBounds(274, 50, 75, 25);
+		btnNewButton.setBounds(355, 50, 75, 25);
 		btnNewButton.setText("Prendi");
 		
 		DateTime dateTime = new DateTime(shell, SWT.BORDER);
-		dateTime.setBounds(283, 255, 80, 24);
+		dateTime.setBounds(258, 302, 103, 24);
 		
 		Button btnAlimentare = new Button(shell, SWT.RADIO);
-		btnAlimentare.setBounds(172, 310, 90, 16);
+		btnAlimentare.addPaintListener(new PaintListener() {
+			public void paintControl(PaintEvent arg0) {
+				btnAlimentare.setEnabled(true);
+			}
+		});
+		btnAlimentare.setBounds(258, 358, 103, 16);
 		btnAlimentare.setText("Alimentare");
 		
 		Button btnNonAlimentare = new Button(shell, SWT.RADIO);
-		btnNonAlimentare.setBounds(292, 310, 109, 16);
+		btnNonAlimentare.setBounds(367, 358, 109, 16);
 		btnNonAlimentare.setText("Non Alimentare");
 		
 
 		Label lblMateriale = new Label(shell, SWT.NONE);
-		lblMateriale.setBounds(182, 276, 55, 15);
+		lblMateriale.setBounds(367, 277, 55, 15);
 		lblMateriale.setText("Materiale");
 		
 		text_3 = new Text(shell, SWT.BORDER);
-		text_3.setBounds(273, 283, 76, 21);
+		text_3.setBounds(367, 302, 76, 24);
 		
 		Button btnCaricaProdotto = new Button(shell, SWT.NONE);
 		btnCaricaProdotto.addSelectionListener(new SelectionAdapter() {
@@ -169,8 +176,8 @@ public class spesaGrafica {
 				}
 			}
 		});
-		btnCaricaProdotto.setBounds(145, 133, 102, 25);
-		btnCaricaProdotto.setText("Carica Prodotto");
+		btnCaricaProdotto.setBounds(423, 176, 29, 25);
+		btnCaricaProdotto.setText("+");
 		
 		Button btnEliminaProdotto = new Button(shell, SWT.NONE);
 		btnEliminaProdotto.addSelectionListener(new SelectionAdapter() {
@@ -181,8 +188,8 @@ public class spesaGrafica {
 				list_1.remove(list_1.getSelectionIndex());
 			}
 		});
-		btnEliminaProdotto.setBounds(274, 133, 108, 25);
-		btnEliminaProdotto.setText("Elimina prodotto");
+		btnEliminaProdotto.setBounds(423, 235, 29, 25);
+		btnEliminaProdotto.setText("-");
 		
 		Button btnNewButton_1 = new Button(shell, SWT.NONE);
 		btnNewButton_1.addSelectionListener(new SelectionAdapter() {
@@ -200,7 +207,7 @@ public class spesaGrafica {
 				System.out.println(prodotti.getNumProdotti());
 			}
 		});
-		btnNewButton_1.setBounds(172, 50, 75, 25);
+		btnNewButton_1.setBounds(274, 50, 75, 25);
 		btnNewButton_1.setText("Riponi");
 		
 		Button btnCaio = new Button(shell, SWT.NONE);
@@ -217,7 +224,7 @@ public class spesaGrafica {
 
 			}
 		});
-		btnCaio.setBounds(0, 264, 75, 25);
+		btnCaio.setBounds(319, 127, 75, 25);
 		btnCaio.setText("Browse File");
 		
 		Label lblScaffali = new Label(shell, SWT.NONE);
@@ -225,22 +232,14 @@ public class spesaGrafica {
 		lblScaffali.setText("Scaffali");
 		
 		Label lblCarrello = new Label(shell, SWT.NONE);
-		lblCarrello.setBounds(479, 10, 55, 15);
+		lblCarrello.setBounds(553, 11, 55, 15);
 		lblCarrello.setText("Carrello");
 		
-		Button btnNewButton_2 = new Button(shell, SWT.NONE);
-		btnNewButton_2.setBounds(353, 176, 29, 25);
-		btnNewButton_2.setText("+");
-		
-		Button btnNewButton_3 = new Button(shell, SWT.NONE);
-		btnNewButton_3.setBounds(353, 224, 29, 25);
-		btnNewButton_3.setText("-");
-		
 		text = new Text(shell, SWT.BORDER);
-		text.setBounds(274, 178, 76, 21);
+		text.setBounds(285, 178, 132, 21);
 		
 		text_1 = new Text(shell, SWT.BORDER);
-		text_1.setBounds(274, 201, 76, 21);
+		text_1.setBounds(285, 205, 132, 21);
 		
 		Label lblCodiceProdotto = new Label(shell, SWT.NONE);
 		lblCodiceProdotto.setBounds(166, 181, 102, 15);
@@ -248,17 +247,17 @@ public class spesaGrafica {
 		
 		Label lblPrezzo = new Label(shell, SWT.NONE);
 		lblPrezzo.setText("Prezzo");
-		lblPrezzo.setBounds(166, 204, 81, 15);
+		lblPrezzo.setBounds(166, 208, 102, 15);
 		
 		text_2 = new Text(shell, SWT.BORDER);
-		text_2.setBounds(273, 226, 76, 21);
+		text_2.setBounds(285, 237, 132, 21);
 		
 		Label lblDescrizione = new Label(shell, SWT.NONE);
 		lblDescrizione.setText("Descrizione");
-		lblDescrizione.setBounds(166, 225, 102, 15);
+		lblDescrizione.setBounds(166, 240, 102, 15);
 		
 		Spinner spinner = new Spinner(shell, SWT.BORDER);
-		spinner.setBounds(354, 200, 47, 22);
+		spinner.setBounds(423, 207, 47, 22);
 		
 		Button btnCaricaScontrino = new Button(shell, SWT.NONE);
 		btnCaricaScontrino.addSelectionListener(new SelectionAdapter() {
@@ -294,7 +293,7 @@ public class spesaGrafica {
 				}
 			}
 		});
-		btnCaricaScontrino.setBounds(132, 96, 115, 25);
+		btnCaricaScontrino.setBounds(234, 96, 115, 25);
 		btnCaricaScontrino.setText("Carica Scontrino");
 		
 		Button btnSalvaScontrino = new Button(shell, SWT.NONE);
@@ -349,10 +348,10 @@ public class spesaGrafica {
 			}
 		});
 		btnSalvaScontrino.setText("Salva Scontrino");
-		btnSalvaScontrino.setBounds(274, 96, 115, 25);
+		btnSalvaScontrino.setBounds(355, 96, 115, 25);
 		
 		Label lblDataScadenxa = new Label(shell, SWT.NONE);
-		lblDataScadenxa.setBounds(172, 255, 102, 15);
+		lblDataScadenxa.setBounds(258, 277, 102, 15);
 		lblDataScadenxa.setText("Data Scadenza");
 		
 
