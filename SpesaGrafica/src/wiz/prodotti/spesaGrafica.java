@@ -80,7 +80,7 @@ public class spesaGrafica {
 	
 	protected void createContents() {
 		shell = new Shell();
-		shell.setBackgroundImage(SWTResourceManager.getImage("C:\\Users\\psman\\git\\ProgettoInformatica\\SpesaGrafica\\SPESA.jpg"));
+		shell.setBackgroundImage(SWTResourceManager.getImage("SPESA.jpg"));
 		shell.addPaintListener(new PaintListener() {
 			public void paintControl(PaintEvent arg0) {
 				if(!on){
@@ -111,7 +111,6 @@ public class spesaGrafica {
 				for(int i=0; i<carrello.getNumProdotti(); i++){
 					temp.getLista()[i] = carrello.getLista()[i];
 				}
-				System.out.println(temp.getMax() + " " + temp.getNumProdotti());
 				temp.getLista()[temp.getNumProdotti()-1] = prodotti.getLista()[list.getSelectionIndex()];
 				carrello = new ListaSpesa(true, temp.getMax());
 				carrello.setNumProdotti(temp.getNumProdotti());
@@ -119,10 +118,7 @@ public class spesaGrafica {
 					carrello.getLista()[i] = temp.getLista()[i];
 
 				}
-				System.out.println(carrello.getMax() +" "+carrello.getNumProdotti());
-
-
-				list_1.add(carrello.getLista()[carrello.getNumProdotti()-1].getDescrizione());
+				list_1.add(carrello.getLista()[carrello.getNumProdotti()-1].getDescrizione() +" - " + carrello.getLista()[carrello.getNumProdotti()-1].getCodice() + " - " + carrello.getLista()[carrello.getNumProdotti()-1].getPrezzo());
 				list_1.update();
 			}
 		});
@@ -133,11 +129,6 @@ public class spesaGrafica {
 		dateTime.setBounds(258, 302, 103, 24);
 		
 		Button btnAlimentare = new Button(shell, SWT.RADIO);
-		btnAlimentare.addPaintListener(new PaintListener() {
-			public void paintControl(PaintEvent arg0) {
-				btnAlimentare.setEnabled(true);
-			}
-		});
 		btnAlimentare.setBounds(258, 358, 103, 16);
 		btnAlimentare.setText("Alimentare");
 		
