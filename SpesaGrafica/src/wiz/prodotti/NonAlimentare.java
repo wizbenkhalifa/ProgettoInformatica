@@ -19,7 +19,7 @@ public class NonAlimentare extends Prodotto {
 	@Override
 	public void applicaSconto() {
 		// TODO Auto-generated method stub
-		if (materiale.equals("carta") || materiale.equals("vetro")) {
+		if (materiale.equals("carta") || materiale.equals("vetro") || materiale.equals("carta") || materiale.equals("vetro")) {
 			prezzo = prezzo *0.90f;
 		} else {
 			super.applicaSconto();
