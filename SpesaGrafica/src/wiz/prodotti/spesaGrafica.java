@@ -1,4 +1,5 @@
 package wiz.prodotti;
+
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -15,7 +16,6 @@ import javax.swing.JTable;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Shell;
-
 
 import org.eclipse.swt.widgets.List;
 import org.eclipse.jface.dialogs.MessageDialog;
@@ -45,8 +45,6 @@ import org.eclipse.ui.forms.widgets.FormToolkit;
 public class spesaGrafica {
 	protected ListaSpesa carrello = new ListaSpesa(true, 40);
 	protected Shell shell;
-	private Prodotto [] p = new Prodotto[5];
-	protected ListaSpesa prodotti = new ListaSpesa(true, 40);
 	private ListaSpesa temp;
 	private Text text;
 	private Text text_1;
@@ -57,23 +55,34 @@ public class spesaGrafica {
 	private Data Data;
 	private Text text_3;
 	private Boolean on;
-	private Table table;
-	private Table table_1;
 	private final FormToolkit formToolkit = new FormToolkit(Display.getDefault());
-	private Table table_2;
 	private Table table_3;
-	
-	public spesaGrafica(){
-		p[0]= new NonAlimentare("1111" , "Patata", 10, "Vetro");
-		p[1]= new NonAlimentare("1111" , "Alice", 10, "Carta");
-		p[2]= new Alimentare("1111" , "Pizza", 10, Data = new Data());
-		p[3]= new Alimentare("1111" , "Ciocccolata", 10, Data = new Data());
-		p[4]= new NonAlimentare("1111" , "Cavei", 10, "Plastica");
-		prodotti = new ListaSpesa(false, 10, p);
+	private Text text_4;
+	private float tot;
+
+	public spesaGrafica() {
 		on = false;
 	}
 
-	
+	public void compilaTabella() {
+		table_3.removeAll();
+		for (int i = 0; i < carrello.getNumProdotti(); i++) {
+			TableItem item = new TableItem(table_3, SWT.NONE);
+			Alimentare a;
+			NonAlimentare na;
+			if (carrello.getLista()[i] instanceof Alimentare) {
+				a = (Alimentare) carrello.getLista()[i];
+				item.setText(new String[] { a.getDescrizione(), String.valueOf(a.getPrezzo()), a.getCodice(), "/",
+				a.getScadenza().toString() });
+			} else {
+				na = (NonAlimentare) carrello.getLista()[i];
+				item.setText(new String[] { na.getDescrizione(), String.valueOf(na.getPrezzo()), na.getCodice(),
+				na.getMateriale(), "/" });
+			}
+		}
+		text_4.setText(Float.toString(tot));
+	}
+
 	public static void main(String[] args) {
 		try {
 			spesaGrafica window = new spesaGrafica();
@@ -83,7 +92,6 @@ public class spesaGrafica {
 		}
 	}
 
-	
 	public void open() {
 		Display display = Display.getDefault();
 		createContents();
@@ -95,397 +103,433 @@ public class spesaGrafica {
 			}
 		}
 	}
-	
+
 	protected void createContents() {
 		shell = new Shell();
 		shell.setBackgroundImage(SWTResourceManager.getImage("SPESA.jpg"));
+		Button btnTesseraFedelt = new Button(shell, SWT.CHECK);
+		btnTesseraFedelt.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				carrello.setTessera(btnTesseraFedelt.getSelection());
+			}
+		});
 		shell.addPaintListener(new PaintListener() {
 			public void paintControl(PaintEvent arg0) {
-				if(!on){
+				if (!on) {
 					on = true;
-					if(MessageDialog.openQuestion(shell, "Tessera", "Possiedi la tessera fedeltà?")){
+					if (MessageDialog.openQuestion(shell, "Tessera", "Possiedi la tessera fedeltà?")) {
 						carrello.setTessera(true);
-					}else{
+						btnTesseraFedelt.setSelection(carrello.isTessera());
+						
+					} else {
 						carrello.setTessera(false);
+						btnTesseraFedelt.setSelection(carrello.isTessera());
 					}
 				}
 			}
 		});
-		shell.setSize(717, 752);
-		shell.setText("SWT Application");
+		shell.setSize(897, 440);
+		shell.setText("Ali & WiZ's");
 		shell.setLayout(new FormLayout());
-		List list_1 = new List(shell, SWT.BORDER);
-		FormData fd_list_1 = new FormData();
-		fd_list_1.bottom = new FormAttachment(0, 326);
-		fd_list_1.right = new FormAttachment(0, 691);
-		fd_list_1.top = new FormAttachment(0, 32);
-		fd_list_1.left = new FormAttachment(0, 472);
-		list_1.setLayoutData(fd_list_1);
 		List list = new List(shell, SWT.BORDER);
 		FormData fd_list = new FormData();
-		fd_list.bottom = new FormAttachment(0, 326);
-		fd_list.right = new FormAttachment(0, 196);
-		fd_list.top = new FormAttachment(0, 32);
+		fd_list.top = new FormAttachment(0, 297);
+		fd_list.bottom = new FormAttachment(100, -10);
+		fd_list.right = new FormAttachment(100, -1310);
 		fd_list.left = new FormAttachment(0, 10);
 		list.setLayoutData(fd_list);
-		for(int i=0; i<prodotti.getNumProdotti(); i++){
-			list.add(prodotti.getLista()[i].getDescrizione());
-		}
-		
-		Button btnNewButton = new Button(shell, SWT.NONE);
-		FormData fd_btnNewButton = new FormData();
-		fd_btnNewButton.right = new FormAttachment(0, 277);
-		fd_btnNewButton.top = new FormAttachment(0, 31);
-		fd_btnNewButton.left = new FormAttachment(0, 202);
-		btnNewButton.setLayoutData(fd_btnNewButton);
-		btnNewButton.addSelectionListener(new SelectionAdapter() {
-			public void widgetSelected(SelectionEvent e) {
-				temp = new ListaSpesa(true, carrello.getMax());
-				temp.setNumProdotti(carrello.getNumProdotti()+1);
-				for(int i=0; i<carrello.getNumProdotti(); i++){
-					temp.getLista()[i] = carrello.getLista()[i];
-				}
-				temp.getLista()[temp.getNumProdotti()-1] = prodotti.getLista()[list.getSelectionIndex()];
-				carrello = new ListaSpesa(true, temp.getMax());
-				carrello.setNumProdotti(temp.getNumProdotti());
-				for(int i=0; i<temp.getNumProdotti(); i++){
-					carrello.getLista()[i] = temp.getLista()[i];
 
-				}
-				list_1.add(carrello.getLista()[carrello.getNumProdotti()-1].getDescrizione() +" - " + carrello.getLista()[carrello.getNumProdotti()-1].getCodice() + " - " + carrello.getLista()[carrello.getNumProdotti()-1].getPrezzo());
-				list_1.update();
-			}
-		});
-		btnNewButton.setText("Prendi");
-		
 		DateTime dateTime = new DateTime(shell, SWT.BORDER);
 		FormData fd_dateTime = new FormData();
-		fd_dateTime.right = new FormAttachment(0, 305);
-		fd_dateTime.top = new FormAttachment(0, 187);
-		fd_dateTime.left = new FormAttachment(0, 202);
 		dateTime.setLayoutData(fd_dateTime);
-		
+
 		Button btnAlimentare = new Button(shell, SWT.RADIO);
 		FormData fd_btnAlimentare = new FormData();
-		fd_btnAlimentare.right = new FormAttachment(0, 305);
-		fd_btnAlimentare.top = new FormAttachment(0, 62);
-		fd_btnAlimentare.left = new FormAttachment(0, 202);
+		fd_btnAlimentare.left = new FormAttachment(list, 0, SWT.LEFT);
+		fd_btnAlimentare.right = new FormAttachment(0, 113);
 		btnAlimentare.setLayoutData(fd_btnAlimentare);
 		btnAlimentare.setText("Alimentare");
-		
+
 		Button btnNonAlimentare = new Button(shell, SWT.RADIO);
 		FormData fd_btnNonAlimentare = new FormData();
-		fd_btnNonAlimentare.right = new FormAttachment(0, 420);
-		fd_btnNonAlimentare.top = new FormAttachment(0, 62);
-		fd_btnNonAlimentare.left = new FormAttachment(0, 311);
+		fd_btnNonAlimentare.right = new FormAttachment(dateTime, 0, SWT.RIGHT);
+		fd_btnNonAlimentare.top = new FormAttachment(btnAlimentare, 0, SWT.TOP);
+		fd_btnNonAlimentare.left = new FormAttachment(dateTime, 0, SWT.LEFT);
 		btnNonAlimentare.setLayoutData(fd_btnNonAlimentare);
 		btnNonAlimentare.setText("Non Alimentare");
-		
 
 		Label lblMateriale = new Label(shell, SWT.NONE);
 		FormData fd_lblMateriale = new FormData();
-		fd_lblMateriale.right = new FormAttachment(0, 365);
-		fd_lblMateriale.top = new FormAttachment(0, 166);
-		fd_lblMateriale.left = new FormAttachment(0, 310);
+		fd_lblMateriale.right = new FormAttachment(btnAlimentare, 0, SWT.RIGHT);
+		fd_lblMateriale.left = new FormAttachment(0, 10);
 		lblMateriale.setLayoutData(fd_lblMateriale);
 		lblMateriale.setText("Materiale");
-		
+
 		text_3 = new Text(shell, SWT.BORDER);
+		fd_dateTime.top = new FormAttachment(text_3, 6);
 		FormData fd_text_3 = new FormData();
-		fd_text_3.bottom = new FormAttachment(0, 211);
-		fd_text_3.right = new FormAttachment(0, 447);
-		fd_text_3.top = new FormAttachment(0, 187);
-		fd_text_3.left = new FormAttachment(0, 311);
+		fd_text_3.left = new FormAttachment(lblMateriale, 6);
 		text_3.setLayoutData(fd_text_3);
+
+		Spinner spinner = new Spinner(shell, SWT.BORDER);
 		
 		Button btnCaricaProdotto = new Button(shell, SWT.NONE);
 		FormData fd_btnCaricaProdotto = new FormData();
-		fd_btnCaricaProdotto.right = new FormAttachment(0, 258);
-		fd_btnCaricaProdotto.top = new FormAttachment(0, 242);
-		fd_btnCaricaProdotto.left = new FormAttachment(0, 202);
+		fd_btnCaricaProdotto.left = new FormAttachment(btnNonAlimentare, 6);
 		btnCaricaProdotto.setLayoutData(fd_btnCaricaProdotto);
 		btnCaricaProdotto.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				if(btnAlimentare.getSelection()){
-					Prodotto pa = new Alimentare(text.getText(), text_2.getText(), Float.parseFloat(text_1.getText()), Data = new Data(dateTime.getDay(), dateTime.getMonth(), dateTime.getYear()));
-					try {
-						prodotti.aggiungiProdotto(pa);
-					} catch (MyOwnException e1) {
-						e1.printStackTrace();
+				if (btnAlimentare.getSelection()) {
+					if(spinner.getSelection()>0){
+						for(int i=0; i<spinner.getSelection(); i++){
+							try {
+								Prodotto pa = new Alimentare(text.getText(), text_2.getText(), Float.parseFloat(text_1.getText()),
+								Data = new Data(dateTime.getDay(), dateTime.getMonth(), dateTime.getYear()));
+								carrello.aggiungiProdotto(pa);
+								tot += pa.getPrezzo();
+							} catch (Exception e1) {
+								MessageDialog.openError(shell, "Errore", "Campi inseriti non validi!");
+							}
+						}
+					}else{
+						try {
+							Prodotto pa = new Alimentare(text.getText(), text_2.getText(), Float.parseFloat(text_1.getText()),
+							Data = new Data(dateTime.getDay(), dateTime.getMonth(), dateTime.getYear()));
+							carrello.aggiungiProdotto(pa);
+							tot += pa.getPrezzo();
+						} catch (Exception e1) {
+							MessageDialog.openError(shell, "Errore", "Campi inseriti non validi!");
+						}
 					}
-					list.add(pa.descrizione);
-				}else if(btnNonAlimentare.getSelection()){
-					Prodotto pa = new NonAlimentare(text.getText(), text_2.getText(), Float.parseFloat(text_1.getText()), text_3.getText());
-					try {
-						prodotti.aggiungiProdotto(pa);
-					} catch (MyOwnException e1) {
-						e1.printStackTrace();
+					compilaTabella();
+				} else if (btnNonAlimentare.getSelection()) {
+					if(spinner.getSelection()>0){
+						for(int i=0; i<spinner.getSelection(); i++){
+							try {
+								Prodotto pa = new NonAlimentare(text.getText(), text_2.getText(),
+								Float.parseFloat(text_1.getText()), text_3.getText());
+								carrello.aggiungiProdotto(pa);
+								tot += pa.getPrezzo();
+							} catch (Exception e1) {
+								MessageDialog.openError(shell, "Errore", "Campi inseriti non validi!");
+							}
+						}
+					}else{
+						try {
+							Prodotto pa = new NonAlimentare(text.getText(), text_2.getText(),
+							Float.parseFloat(text_1.getText()), text_3.getText());
+							carrello.aggiungiProdotto(pa);
+							tot += pa.getPrezzo();
+						} catch (Exception e1) {
+							MessageDialog.openError(shell, "Errore", "Campi inseriti non validi!");
+						}
 					}
-					list.add(pa.descrizione);
+					compilaTabella();
+				}else{
+					MessageDialog.openWarning(shell, "Avviso", "Selezionare tipo di prodotto");
 				}
 			}
 		});
 		btnCaricaProdotto.setText("+");
-		
+
 		Button btnEliminaProdotto = new Button(shell, SWT.NONE);
+		fd_btnCaricaProdotto.right = new FormAttachment(btnEliminaProdotto, 0, SWT.RIGHT);
 		FormData fd_btnEliminaProdotto = new FormData();
-		fd_btnEliminaProdotto.right = new FormAttachment(0, 466);
-		fd_btnEliminaProdotto.top = new FormAttachment(0, 242);
-		fd_btnEliminaProdotto.left = new FormAttachment(0, 411);
+		fd_btnEliminaProdotto.top = new FormAttachment(lblMateriale, -5, SWT.TOP);
+		fd_btnEliminaProdotto.left = new FormAttachment(text_3, 6);
 		btnEliminaProdotto.setLayoutData(fd_btnEliminaProdotto);
 		btnEliminaProdotto.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				System.out.print(list_1.getSelectionIndex() + "\n");
-				carrello.eliminaProdotto(list_1.getSelectionIndex());
-				list_1.remove(list_1.getSelectionIndex());
+				try {
+					if (table_3.getSelectionIndex() != -1) {
+						carrello.eliminaProdotto(table_3.getSelectionIndex());
+						tot -=carrello.getLista()[table_3.getSelectionIndex()].getPrezzo();
+					} else {
+						carrello.eliminaProdotto(carrello.getNumProdotti() - 1);
+						tot -=carrello.getLista()[carrello.getNumProdotti()-1].getPrezzo();
+					}
+				} catch (Exception e1) {
+					MessageDialog.openError(shell, "Errore", "Elemento Selezionato non esistente");
+				}
+				compilaTabella();
 			}
 		});
 		btnEliminaProdotto.setText("-");
-		
-		Button btnNewButton_1 = new Button(shell, SWT.NONE);
-		FormData fd_btnNewButton_1 = new FormData();
-		fd_btnNewButton_1.right = new FormAttachment(0, 466);
-		fd_btnNewButton_1.top = new FormAttachment(0, 31);
-		fd_btnNewButton_1.left = new FormAttachment(0, 391);
-		btnNewButton_1.setLayoutData(fd_btnNewButton_1);
-		btnNewButton_1.addSelectionListener(new SelectionAdapter() {
-			@Override
-			public void widgetSelected(SelectionEvent e) {
-				list.add(carrello.getLista()[list_1.getSelectionIndex()].getDescrizione());
-				try {
-					prodotti.aggiungiProdotto(carrello.getLista()[list_1.getSelectionIndex()]);
-					carrello.eliminaProdotto(list_1.getSelectionIndex());
-				} catch (MyOwnException e1) {
-					e1.printStackTrace();
-				}
-				list_1.remove(list_1.getSelectionIndex());
-				System.out.println(carrello.getNumProdotti());
-				System.out.println(prodotti.getNumProdotti());
-			}
-		});
-		btnNewButton_1.setText("Riponi");
-		
+
 		Button btnCaio = new Button(shell, SWT.NONE);
+		fd_btnAlimentare.top = new FormAttachment(btnCaio, 6);
 		FormData fd_btnCaio = new FormData();
-		fd_btnCaio.right = new FormAttachment(0, 371);
-		fd_btnCaio.top = new FormAttachment(0, 31);
-		fd_btnCaio.left = new FormAttachment(0, 296);
+		fd_btnCaio.right = new FormAttachment(dateTime, 0, SWT.RIGHT);
+		fd_btnCaio.left = new FormAttachment(0, 10);
 		btnCaio.setLayoutData(fd_btnCaio);
 		btnCaio.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 				FileDialog fd = new FileDialog(shell);
-				fd.setFilterExtensions(new String[]{"*.txt", "*.csv", "*.*"});
+				fd.setFilterExtensions(new String[] { "*.txt", "*.csv", "*.*" });
 				fs = fd.open();
-				
-				if(fs != null) {
+
+				if (fs != null) {
 					file = new File(fs);
 				}
 
 			}
 		});
 		btnCaio.setText("Browse File");
-		
-		Label lblScaffali = new Label(shell, SWT.NONE);
-		FormData fd_lblScaffali = new FormData();
-		fd_lblScaffali.right = new FormAttachment(0, 81);
-		fd_lblScaffali.top = new FormAttachment(0, 10);
-		fd_lblScaffali.left = new FormAttachment(0, 10);
-		lblScaffali.setLayoutData(fd_lblScaffali);
-		lblScaffali.setText("Scaffali");
-		
-		Label lblCarrello = new Label(shell, SWT.NONE);
-		FormData fd_lblCarrello = new FormData();
-		fd_lblCarrello.right = new FormAttachment(0, 608);
-		fd_lblCarrello.top = new FormAttachment(0, 11);
-		fd_lblCarrello.left = new FormAttachment(0, 553);
-		lblCarrello.setLayoutData(fd_lblCarrello);
-		lblCarrello.setText("Carrello");
-		
+
 		text = new Text(shell, SWT.BORDER);
+		fd_btnCaricaProdotto.top = new FormAttachment(text, -2, SWT.TOP);
 		FormData fd_text = new FormData();
-		fd_text.right = new FormAttachment(0, 442);
-		fd_text.top = new FormAttachment(0, 85);
-		fd_text.left = new FormAttachment(0, 310);
+		fd_text.top = new FormAttachment(btnNonAlimentare, 6);
+		fd_text.right = new FormAttachment(100, -630);
 		text.setLayoutData(fd_text);
-		
+
 		text_1 = new Text(shell, SWT.BORDER);
 		FormData fd_text_1 = new FormData();
-		fd_text_1.right = new FormAttachment(0, 443);
-		fd_text_1.top = new FormAttachment(0, 112);
-		fd_text_1.left = new FormAttachment(0, 311);
+		fd_text_1.top = new FormAttachment(text, 6);
 		text_1.setLayoutData(fd_text_1);
-		
+
 		Label lblCodiceProdotto = new Label(shell, SWT.NONE);
+		fd_text.left = new FormAttachment(lblCodiceProdotto, 7);
 		FormData fd_lblCodiceProdotto = new FormData();
-		fd_lblCodiceProdotto.right = new FormAttachment(0, 304);
-		fd_lblCodiceProdotto.top = new FormAttachment(0, 88);
-		fd_lblCodiceProdotto.left = new FormAttachment(0, 202);
+		fd_lblCodiceProdotto.top = new FormAttachment(btnAlimentare, 6);
+		fd_lblCodiceProdotto.left = new FormAttachment(list, 0, SWT.LEFT);
+		fd_lblCodiceProdotto.right = new FormAttachment(0, 112);
 		lblCodiceProdotto.setLayoutData(fd_lblCodiceProdotto);
 		lblCodiceProdotto.setText("Codice Prodotto");
-		
+
 		Label lblPrezzo = new Label(shell, SWT.NONE);
+		fd_text_1.left = new FormAttachment(lblPrezzo, 7);
 		FormData fd_lblPrezzo = new FormData();
-		fd_lblPrezzo.right = new FormAttachment(0, 304);
-		fd_lblPrezzo.top = new FormAttachment(0, 115);
-		fd_lblPrezzo.left = new FormAttachment(0, 202);
+		fd_lblPrezzo.top = new FormAttachment(text_1, 3, SWT.TOP);
+		fd_lblPrezzo.left = new FormAttachment(list, 0, SWT.LEFT);
+		fd_lblPrezzo.right = new FormAttachment(0, 112);
 		lblPrezzo.setLayoutData(fd_lblPrezzo);
 		lblPrezzo.setText("Prezzo");
-		
+
 		text_2 = new Text(shell, SWT.BORDER);
+		fd_text_3.top = new FormAttachment(text_2, 6);
 		FormData fd_text_2 = new FormData();
-		fd_text_2.right = new FormAttachment(0, 443);
-		fd_text_2.top = new FormAttachment(0, 139);
-		fd_text_2.left = new FormAttachment(0, 311);
+		fd_text_2.top = new FormAttachment(text_1, 6);
 		text_2.setLayoutData(fd_text_2);
-		
+
 		Label lblDescrizione = new Label(shell, SWT.NONE);
+		fd_text_2.left = new FormAttachment(lblDescrizione, 7);
+		fd_lblMateriale.top = new FormAttachment(lblDescrizione, 12);
 		FormData fd_lblDescrizione = new FormData();
-		fd_lblDescrizione.right = new FormAttachment(0, 304);
-		fd_lblDescrizione.top = new FormAttachment(0, 142);
-		fd_lblDescrizione.left = new FormAttachment(0, 202);
+		fd_lblDescrizione.top = new FormAttachment(text_2, 3, SWT.TOP);
+		fd_lblDescrizione.right = new FormAttachment(btnAlimentare, -1, SWT.RIGHT);
+		fd_lblDescrizione.left = new FormAttachment(list, 0, SWT.LEFT);
 		lblDescrizione.setLayoutData(fd_lblDescrizione);
 		lblDescrizione.setText("Descrizione");
-		
-		Spinner spinner = new Spinner(shell, SWT.BORDER);
+
 		FormData fd_spinner = new FormData();
-		fd_spinner.right = new FormAttachment(0, 365);
-		fd_spinner.top = new FormAttachment(0, 244);
-		fd_spinner.left = new FormAttachment(0, 311);
+		fd_spinner.bottom = new FormAttachment(btnEliminaProdotto, -16);
+		fd_spinner.left = new FormAttachment(btnCaricaProdotto, 0, SWT.LEFT);
+		fd_spinner.right = new FormAttachment(btnCaricaProdotto, 0, SWT.RIGHT);
 		spinner.setLayoutData(fd_spinner);
-		
+
 		Button btnCaricaScontrino = new Button(shell, SWT.NONE);
 		FormData fd_btnCaricaScontrino = new FormData();
-		fd_btnCaricaScontrino.right = new FormAttachment(0, 691);
-		fd_btnCaricaScontrino.top = new FormAttachment(0, 332);
-		fd_btnCaricaScontrino.left = new FormAttachment(0, 576);
+		fd_btnCaricaScontrino.top = new FormAttachment(dateTime, 6);
+		fd_btnCaricaScontrino.right = new FormAttachment(dateTime, 0, SWT.RIGHT);
+		fd_btnCaricaScontrino.left = new FormAttachment(0, 6);
 		btnCaricaScontrino.setLayoutData(fd_btnCaricaScontrino);
 		btnCaricaScontrino.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 				try {
-					String [] s1 = new String[4];
+					String[] s1 = new String[4];
 					String s = new String();
 					fr = new FileReader(file);
 					BufferedReader br = new BufferedReader(fr);
 					StringBuffer stringBuffer = new StringBuffer();
-					list_1.removeAll();
 					carrello = new ListaSpesa(true, carrello.getMax());
 					while ((s = br.readLine()) != null) {
 						stringBuffer.append(s);
 						s1 = s.split(" ");
 						Prodotto p1;
-						if(s1[4].equals("Carta") || s1[4].equals("Vetro") || s1[4].equals("Plastica")){
+						if (s1[4].equals("Carta") || s1[4].equals("Vetro") || s1[4].equals("Plastica")) {
 							p1 = new NonAlimentare(s1[2], s1[1], Float.parseFloat(s1[3]), s1[4]);
-						}else{
+						} else {
 							System.out.println(Data);
-							p1 = new Alimentare(s1[2], s1[1], Float.parseFloat(s1[3]), Data = new Data(Integer.parseInt((s1[4].split("/"))[0]), Integer.parseInt((s1[4].split("/"))[1]), Integer.parseInt((s1[4].split("/"))[2])));
+							p1 = new Alimentare(s1[2], s1[1], Float.parseFloat(s1[3]),
+							Data = new Data(Integer.parseInt((s1[4].split("/"))[0]),
+							Integer.parseInt((s1[4].split("/"))[1]),
+							Integer.parseInt((s1[4].split("/"))[2])));
 						}
-						carrello.aggiungiProdotto(p1);	
-						list_1.add(s1[1] + " " + s1[4]);
+						carrello.aggiungiProdotto(p1);
+						tot += p1.getPrezzo();
+						compilaTabella();
 					}
 				} catch (IOException e1) {
 					// TODO Auto-generated catch block
-					e1.printStackTrace();
+					MessageDialog.openError(shell, "Errore", "Errore nella lettura!");
 				} catch (MyOwnException e1) {
 					// TODO Auto-generated catch block
-					e1.printStackTrace();
+					MessageDialog.openError(shell, "Errore", "Errore nella lettura!");
 				}
 			}
 		});
 		btnCaricaScontrino.setText("Carica Scontrino");
-		
+
 		Button btnSalvaScontrino = new Button(shell, SWT.NONE);
 		FormData fd_btnSalvaScontrino = new FormData();
-		fd_btnSalvaScontrino.right = new FormAttachment(0, 125);
-		fd_btnSalvaScontrino.top = new FormAttachment(0, 332);
-		fd_btnSalvaScontrino.left = new FormAttachment(0, 10);
+		fd_btnSalvaScontrino.top = new FormAttachment(btnCaricaScontrino, 0, SWT.TOP);
+		fd_btnSalvaScontrino.left = new FormAttachment(btnCaricaProdotto, 0, SWT.LEFT);
 		btnSalvaScontrino.setLayoutData(fd_btnSalvaScontrino);
 		btnSalvaScontrino.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 				try {
-				    if(file.createNewFile()){
-				    	FileWriter f = new FileWriter(file, false);
-				    	BufferedWriter fw = new BufferedWriter(f);
-				    	int i = 0;
-				    	Alimentare a;
-				    	NonAlimentare na;
-				    	while(i<carrello.getNumProdotti()){				    		
-				    		if (carrello.getLista()[i] instanceof Alimentare) {
-				    			a = (Alimentare)carrello.getLista()[i];
-				    			fw.write(i+1 + " "+a.getDescrizione() + " " + a.getPrezzo() + " " + a.getCodice() + " " + a.getScadenza() + "\r\n");
-				    		} else {
-				    			na = (NonAlimentare)carrello.getLista()[i];
-				    			fw.write(i+1 + " "+na.getDescrizione() + " " + na.getPrezzo() + " " + na.getCodice() + " "+ na.getMateriale() + "\r\n");
-				    		}
-					    	
-					    	i++;
-				    	}
-				    	fw.close();
-				    }else{
-				    	 File fold=new File(fs);
-				         fold.delete();
-				         FileWriter f = new FileWriter(file, false);
-					    	BufferedWriter fw = new BufferedWriter(f);
-					    	int i = 0;
-					    	Alimentare a;
-					    	NonAlimentare na;
-					    	while(i<carrello.getNumProdotti()){				    		
-					    		if (carrello.getLista()[i] instanceof Alimentare) {
-					    			a = (Alimentare)carrello.getLista()[i];
-					    			fw.write(i+1 + " "+a.getDescrizione() + " " + a.getPrezzo() + " " + a.getCodice() + " " + a.getScadenza() + "\r\n");
-					    		} else {
-					    			na = (NonAlimentare)carrello.getLista()[i];
-					    			fw.write(i+1 + " "+na.getDescrizione() + " " + na.getPrezzo() + " " + na.getCodice() + " "+ na.getMateriale() + "\r\n");
-					    		}
-						    	
-						    	i++;
-					    	}
-					    	fw.close();
-					    	MessageDialog.openInformation(shell, "Avviso", "Salvataggio riuscito");
-				    }
-				  }
-				  catch (IOException e1) {
-				    e1.printStackTrace();
-				  }
+					if (file.createNewFile()) {
+						FileWriter f = new FileWriter(file, false);
+						BufferedWriter fw = new BufferedWriter(f);
+						int i = 0;
+						Alimentare a;
+						NonAlimentare na;
+						while (i < carrello.getNumProdotti()) {
+							if (carrello.getLista()[i] instanceof Alimentare) {
+								a = (Alimentare) carrello.getLista()[i];
+								fw.write(i + 1 + " " + a.getDescrizione() + " " + a.getPrezzo() + " " + a.getCodice()
+										+ " " + a.getScadenza() + "\r\n");
+							} else {
+								na = (NonAlimentare) carrello.getLista()[i];
+								fw.write(i + 1 + " " + na.getDescrizione() + " " + na.getPrezzo() + " " + na.getCodice()
+										+ " " + na.getMateriale() + "\r\n");
+							}
+
+							i++;
+						}
+						fw.close();
+					} else {
+						File fold = new File(fs);
+						fold.delete();
+						FileWriter f = new FileWriter(file, false);
+						BufferedWriter fw = new BufferedWriter(f);
+						int i = 0;
+						Alimentare a;
+						NonAlimentare na;
+						while (i < carrello.getNumProdotti()) {
+							if (carrello.getLista()[i] instanceof Alimentare) {
+								a = (Alimentare) carrello.getLista()[i];
+								fw.write(i + 1 + "-" + a.getDescrizione() + "-" + a.getPrezzo() + "-" + a.getCodice()
+										+ "-" + a.getScadenza() + "\r\n");
+							} else {
+								na = (NonAlimentare) carrello.getLista()[i];
+								fw.write(i + 1 + "-" + na.getDescrizione() + "-" + na.getPrezzo() + "-" + na.getCodice()
+										+ "-" + na.getMateriale() + "\r\n");
+							}
+							i++;
+						}
+						fw.write("TOTALE:" + Float.toString(tot));
+						fw.close();
+						MessageDialog.openInformation(shell, "Avviso", "Salvataggio riuscito");
+					}
+				} catch (IOException e1) {
+					MessageDialog.openError(shell, "Errore", "Errore nella scrittura!");
+				}
 			}
 		});
 		btnSalvaScontrino.setText("Salva Scontrino");
-		
+
 		Label lblDataScadenxa = new Label(shell, SWT.NONE);
+		fd_dateTime.left = new FormAttachment(lblDataScadenxa, 6);
 		FormData fd_lblDataScadenxa = new FormData();
-		fd_lblDataScadenxa.right = new FormAttachment(0, 304);
-		fd_lblDataScadenxa.top = new FormAttachment(0, 166);
-		fd_lblDataScadenxa.left = new FormAttachment(0, 202);
+		fd_lblDataScadenxa.top = new FormAttachment(dateTime, 0, SWT.TOP);
+		fd_lblDataScadenxa.left = new FormAttachment(list, 1, SWT.LEFT);
+		fd_lblDataScadenxa.right = new FormAttachment(100, -768);
 		lblDataScadenxa.setLayoutData(fd_lblDataScadenxa);
 		lblDataScadenxa.setText("Data Scadenza");
-		
+
 		table_3 = new Table(shell, SWT.BORDER | SWT.FULL_SELECTION);
+		fd_text_1.right = new FormAttachment(table_3, -248);
+		fd_text_2.right = new FormAttachment(table_3, -248);
+		fd_btnEliminaProdotto.right = new FormAttachment(table_3, -91);
+		fd_dateTime.right = new FormAttachment(table_3, -248);
+		fd_text_3.right = new FormAttachment(table_3, -248);
+		fd_btnCaio.top = new FormAttachment(table_3, 0, SWT.TOP);
 		table_3.setLinesVisible(true);
-		String [] s = {"Prodotto", "Prezzo", "Codice", "Materiale", "Data scadenza"};
+		String[] s = { "Prodotto", "Prezzo", "Codice", "Materiale", "Data scadenza" };
 		for (int i = 0; i < 5; i++) {
 			TableColumn column = new TableColumn(table_3, SWT.NONE);
 			column.setWidth(100);
 			column.setText(s[i]);
 		}
-		for (int i = 0; i < prodotti.getNumProdotti(); i++) {
-		    TableItem item = new TableItem(table_3, SWT.NONE);
-		    item.setText(new String[] { prodotti.getLista()[i].getDescrizione(),String.valueOf(prodotti.getLista()[i].getPrezzo()),prodotti.getLista()[i].getCodice()});
+		for (int i = 0; i < carrello.getNumProdotti(); i++) {
+			TableItem item = new TableItem(table_3, SWT.NONE);
+			Alimentare a;
+			NonAlimentare na;
+			if (carrello.getLista()[i] instanceof Alimentare) {
+				a = (Alimentare) carrello.getLista()[i];
+				item.setText(new String[] { a.getDescrizione(), String.valueOf(a.getPrezzo()), a.getCodice(), "/",
+						a.getScadenza().toString() });
+			} else {
+				na = (NonAlimentare) carrello.getLista()[i];
+				item.setText(new String[] { na.getDescrizione(), String.valueOf(na.getPrezzo()), na.getCodice(),
+						na.getMateriale(), "/" });
+			}
 		}
 		FormData fd_table_3 = new FormData();
-		fd_table_3.right = new FormAttachment(btnNonAlimentare, 143, SWT.RIGHT);
-		fd_table_3.bottom = new FormAttachment(btnSalvaScontrino, 237, SWT.BOTTOM);
-		fd_table_3.top = new FormAttachment(btnSalvaScontrino, 6);
-		fd_table_3.left = new FormAttachment(0, 109);
+		fd_table_3.bottom = new FormAttachment(100, -20);
+		fd_table_3.top = new FormAttachment(0, 16);
+		fd_table_3.left = new FormAttachment(0, 499);
+		fd_table_3.right = new FormAttachment(100, -10);
 		table_3.setLayoutData(fd_table_3);
 		formToolkit.adapt(table_3);
 		formToolkit.paintBordersFor(table_3);
 		table_3.setHeaderVisible(true);
 		table_3.setLinesVisible(true);
 		
+		Button btnSvuotaCarrello = new Button(shell, SWT.NONE);
+		fd_btnSalvaScontrino.right = new FormAttachment(btnSvuotaCarrello, 0, SWT.RIGHT);
+		btnSvuotaCarrello.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				
+				for(int i = 0; i<carrello.getNumProdotti(); i++)
+				carrello.eliminaProdotto(i);
+				
+				compilaTabella();
+			}
+		});
+		FormData fd_btnSvuotaCarrello = new FormData();
+		fd_btnSvuotaCarrello.top = new FormAttachment(btnCaio, 0, SWT.TOP);
+		fd_btnSvuotaCarrello.right = new FormAttachment(dateTime, 247, SWT.RIGHT);
+		fd_btnSvuotaCarrello.left = new FormAttachment(btnCaricaProdotto, 0, SWT.LEFT);
+		btnSvuotaCarrello.setLayoutData(fd_btnSvuotaCarrello);
+		formToolkit.adapt(btnSvuotaCarrello, true, true);
+		btnSvuotaCarrello.setText("Svuota carrello");
+		
+		FormData fd_btnTesseraFedelt = new FormData();
+		fd_btnTesseraFedelt.bottom = new FormAttachment(list, -43);
+		fd_btnTesseraFedelt.top = new FormAttachment(btnCaricaScontrino, 6);
+		fd_btnTesseraFedelt.left = new FormAttachment(list, 0, SWT.LEFT);
+		fd_btnTesseraFedelt.right = new FormAttachment(0, 133);
+		btnTesseraFedelt.setLayoutData(fd_btnTesseraFedelt);
+		formToolkit.adapt(btnTesseraFedelt, true, true);
+		btnTesseraFedelt.setText("Tessera Fedelt\u00E0");
+		
+		Label lblTotale = new Label(shell, SWT.NONE);
+		FormData fd_lblTotale = new FormData();
+		fd_lblTotale.right = new FormAttachment(0, 76);
+		fd_lblTotale.top = new FormAttachment(btnTesseraFedelt, 21);
+		fd_lblTotale.left = new FormAttachment(0, 10);
+		lblTotale.setLayoutData(fd_lblTotale);
+		formToolkit.adapt(lblTotale, true, true);
+		lblTotale.setText("TOTALE:");
+		
+		text_4 = new Text(shell, SWT.BORDER | SWT.READ_ONLY);
+		FormData fd_text_4 = new FormData();
+		fd_text_4.bottom = new FormAttachment(btnTesseraFedelt, 60, SWT.BOTTOM);
+		fd_text_4.right = new FormAttachment(lblTotale, 129, SWT.RIGHT);
+		fd_text_4.top = new FormAttachment(btnTesseraFedelt, 15);
+		fd_text_4.left = new FormAttachment(lblTotale, 6);
+		text_4.setLayoutData(fd_text_4);
+		formToolkit.adapt(text_4, true, true);
 
 	}
 }
