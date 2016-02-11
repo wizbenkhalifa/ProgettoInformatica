@@ -61,8 +61,6 @@ public class ListaSpesa {
 			}else{
 				lista[numProdotti++] = p;
 			}
-		}else{
-			throw new MyOwnException("la lista della spesa è piena");
 		}
 	}
 	
